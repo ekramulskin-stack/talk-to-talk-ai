@@ -1,0 +1,12 @@
+﻿# Talk to Talk AI — Universal AI Voice Communication Platform
+
+Real-time, two-way voice-to-voice communication platform supporting **Bengali, Hindi, English, Marathi, and Kannada**, with automatic script/Hinglish/Banglish detection, context-aware translation, and neural voice synthesis.
+
+## Quick Start (One Command)
+`ash
+docker-compose up --buildmkdir "C:\Users\ekram\Desktop\talk-to-talk-ai\static" -Force; cd "C:\Users\ekram\Desktop\talk-to-talk-ai"
+
+@"
+fastapi==0.115.0
+uvicorn==0.30.6
+edge-tts==6.1.12

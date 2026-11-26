@@ -1,0 +1,261 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Talk to Talk AI – Universal Voice Communication</title>
+  <style>
+    :root { --dark-bg: #030917; --navy-card: #08152e; --navy-input: #040d21; --light-blue: #38bdf8; --bright-cyan: #7dd3fc; --border-glow: rgba(56, 189, 248, 0.32); --text-main: #f0f9ff; --text-muted: #93c5fd; }
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { margin: 0; background: radial-gradient(circle at top center, #0c234a 0%, #030917 65%); color: var(--text-main); padding: 16px; min-height: 100vh; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: rgba(8, 21, 46, 0.92); border: 1px solid var(--border-glow); border-radius: 16px; padding: 12px 20px; margin-bottom: 14px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .ai-logo { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #38bdf8); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(56, 189, 248, 0.55); }
+    .brand h1 { margin: 0; font-size: 1.45rem; background: linear-gradient(90deg, #ffffff, #7dd3fc, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .brand p { margin: 2px 0 0 0; font-size: 0.8rem; color: var(--text-muted); }
+    .controls-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .status-pill { background: rgba(14, 165, 233, 0.18); border: 1px solid rgba(56, 189, 248, 0.5); color: var(--bright-cyan); padding: 6px 13px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+    .context-select { width: auto; margin: 0; padding: 6px 12px; font-size: 0.8rem; border-radius: 999px; background: #040d21; color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.45); }
+    .output-console { background: linear-gradient(180deg, #091a38 0%, #061024 100%); border: 1px solid rgba(56, 189, 248, 0.45); border-radius: 14px; padding: 14px 18px; margin-bottom: 16px; }
+    .console-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .msg { background: rgba(3, 9, 23, 0.92); border: 1px solid rgba(56, 189, 248, 0.25); border-left: 4px solid var(--light-blue); padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; }
+    .msg-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .toggle-arrow-btn { width: 100%; margin-top: 4px; background: rgba(56, 189, 248, 0.12); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35); padding: 7px 12px; border-radius: 9px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: none; justify-content: center; align-items: center; gap: 6px; }
+    .toggle-arrow-btn:hover { background: rgba(56, 189, 248, 0.22); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 780px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--navy-card); border: 1px solid var(--border-glow); border-radius: 14px; padding: 16px; }
+    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .card-head h2 { margin: 0; font-size: 1.1rem; color: #e0f2fe; }
+    .tag-blue { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.35); padding: 3px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+    label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px; }
+    select, textarea { width: 100%; background: var(--navy-input); color: #f0f9ff; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 9px; padding: 9px; font-size: 0.9rem; margin-bottom: 9px; outline: none; }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 9px; }
+    .chip { background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); color: #bae6fd; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; cursor: pointer; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    button { background: linear-gradient(135deg, #0284c7, #38bdf8); color: #030917; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.84rem; }
+    button.mic { background: rgba(56, 189, 248, 0.16); color: #7dd3fc; border: 1px solid #38bdf8; }
+    button.cloud { background: #0f2952; color: #bae6fd; border: 1px solid rgba(56, 189, 248, 0.3); }
+    button.speak { background: linear-gradient(135deg, #38bdf8, #7dd3fc); color: #030917; padding: 5px 11px; font-size: 0.78rem; }
+    .inline-preview { margin-top: 10px; background: rgba(3, 9, 23, 0.85); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 8px 10px; font-size: 0.86rem; color: #7dd3fc; display: none; }
+    .warn-box { background: rgba(245, 158, 11, 0.14); border: 1px solid #f59e0b; color: #fde68a; padding: 9px 12px; border-radius: 9px; font-size: 0.82rem; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="ai-logo">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+            <rect x="4" y="12" width="3" height="8" rx="1.5" fill="#030917"/><rect x="9.5" y="7" width="3" height="18" rx="1.5" fill="#030917"/><rect x="15" y="4" width="3" height="24" rx="1.5" fill="#030917"/><rect x="20.5" y="9" width="3" height="14" rx="1.5" fill="#030917"/><rect x="26" y="13" width="3" height="6" rx="1.5" fill="#030917"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Talk to Talk AI</h1>
+          <p>Speak Your Language. Understand the World. • Context-Aware Voice Bridge</p>
+        </div>
+      </div>
+      <div class="controls-bar">
+        <select id="contextSelect" class="context-select">
+          <option value="general">Context: Everyday</option>
+          <option value="hospital">Context: Hospital</option>
+          <option value="railway">Context: Railway Station</option>
+          <option value="shopping">Context: Market / UPI</option>
+        </select>
+        <div class="status-pill" id="voiceIndicator">🔊 Auto-Voice: ON</div>
+      </div>
+    </header>
+
+    <div id="keyBanner"></div>
+    <audio id="voicePlayer" preload="auto"></audio>
+
+    <div class="output-console">
+      <div class="console-top">
+        <div style="font-size:0.9rem;font-weight:700;color:#38bdf8;">⚡ Live Two-Way Neural Voice Stream</div>
+        <button class="cloud" style="padding:4px 10px;font-size:0.75rem;" onclick="clearFeed()">Clear Stream</button>
+      </div>
+      <div id="conversationFeed"><div style="color: #93c5fd; font-size: 0.86rem;">Speak or type below — translation and human-like neural voice playback start automatically.</div></div>
+      <button id="toggleOlderBtn" class="toggle-arrow-btn" onclick="toggleOlderMessages()"></button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><h2>Person A</h2><span class="tag-blue">Auto-Detect + Banglish</span></div>
+        <label>Person A's Preferred Listening Language</label>
+        <select id="langA"><option value="bn" selected>Bengali (বাংলা)</option><option value="hi">Hindi (हिन्दी)</option><option value="en">English</option><option value="mr">Marathi (मराठी)</option><option value="kn">Kannada (ಕನ್ನಡ)</option></select>
+        <div class="chips">
+          <span class="chip" onclick="setText('inputA', 'Hello, how are you? I need help.')">Greeting</span>
+          <span class="chip" onclick="setText('inputA', 'kemon achen? amar sahajyo chai')">Banglish</span>
+          <span class="chip" onclick="setText('inputA', 'Which platform does the express train arrive on?')">Railway</span>
+        </div>
+        <textarea id="inputA" rows="2" placeholder="Speak or type in any language..."></textarea>
+        <div class="btn-row">
+          <button class="mic" onclick="recordVoice('inputA', 'langA', 'langB', 'previewA', 'Person A')">🎤 Speak & Translate</button>
+          <button onclick="sendTurn('Person A', 'inputA', 'langB', 'previewA', false)">Translate to B →</button>
+          <button class="cloud" onclick="sendTurn('Person A', 'inputA', 'langB', 'previewA', true)">Cloud AI</button>
+        </div>
+        <div id="previewA" class="inline-preview"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Person B</h2><span class="tag-blue">Auto-Detect + Hinglish</span></div>
+        <label>Person B's Preferred Listening Language</label>
+        <select id="langB"><option value="hi" selected>Hindi (हिन्दी)</option><option value="bn">Bengali (বাংলা)</option><option value="en">English</option><option value="mr">Marathi (मराठी)</option><option value="kn">Kannada (ಕನ್ನಡ)</option></select>
+        <div class="chips">
+          <span class="chip" onclick="setText('inputB', 'main badhiya hun')">Hinglish</span>
+          <span class="chip" onclick="setText('inputB', 'I need to see a doctor at the hospital.')">Hospital</span>
+          <span class="chip" onclick="setText('inputB', 'ye kitne ka hai')">Market / UPI</span>
+        </div>
+        <textarea id="inputB" rows="2" placeholder="Speak or type in any language..."></textarea>
+        <div class="btn-row">
+          <button class="mic" onclick="recordVoice('inputB', 'langB', 'langA', 'previewB', 'Person B')">🎤 Speak & Translate</button>
+          <button onclick="sendTurn('Person B', 'inputB', 'langA', 'previewB', false)">← Translate to A</button>
+        </div>
+        <div id="previewB" class="inline-preview"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let messagesList = [];
+    let showAllMessages = false;
+    const SILENT_WAV = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+
+    function unlockAudio() {
+      const player = document.getElementById('voicePlayer');
+      player.pause();
+      player.src = SILENT_WAV;
+      player.play().catch(() => {});
+    }
+
+    function setText(id, val) { document.getElementById(id).value = val; }
+
+    function toggleOlderMessages() {
+      showAllMessages = !showAllMessages;
+      renderMessages();
+    }
+
+    function clearFeed() {
+      messagesList = [];
+      showAllMessages = false;
+      document.getElementById('toggleOlderBtn').style.display = 'none';
+      document.getElementById('conversationFeed').innerHTML = '<div style="color: #93c5fd; font-size: 0.86rem;">Stream cleared. Speak or type below to start a new conversation.</div>';
+    }
+
+    function renderMessages() {
+      const feed = document.getElementById('conversationFeed');
+      const toggleBtn = document.getElementById('toggleOlderBtn');
+      feed.innerHTML = "";
+
+      const visible = showAllMessages ? messagesList : messagesList.slice(0, 3);
+      visible.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'msg';
+
+        const meta = document.createElement('div');
+        meta.className = 'msg-meta';
+        meta.innerHTML = `<span><strong>${item.speakerName}</strong> • ${item.detected_language} → <strong>${item.target_language_name}</strong> (${item.context})</span><span>${item.timestamp}</span>`;
+
+        const orig = document.createElement('div');
+        orig.style.cssText = 'color:#93c5fd;font-size:0.82rem;margin-bottom:4px;';
+        orig.textContent = `Original: "${item.spoken_text}"`;
+
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:10px;';
+        const outText = document.createElement('div');
+        outText.style.cssText = 'font-size:1.05rem;font-weight:700;color:#7dd3fc;';
+        outText.textContent = item.translated_text;
+
+        const replayBtn = document.createElement('button');
+        replayBtn.className = 'speak';
+        replayBtn.textContent = '🔊 Replay';
+        replayBtn.addEventListener('click', () => playNeuralVoice(item.translated_text, item.target_lang));
+
+        row.appendChild(outText);
+        row.appendChild(replayBtn);
+        card.appendChild(meta);
+        card.appendChild(orig);
+        card.appendChild(row);
+        feed.appendChild(card);
+      });
+
+      if (messagesList.length > 3) {
+        const hiddenCount = messagesList.length - 3;
+        toggleBtn.style.display = 'flex';
+        toggleBtn.textContent = showAllMessages
+          ? '⬆️ Show Less (Keep Top 3)'
+          : `⬇️ Show ${hiddenCount} Older Message${hiddenCount > 1 ? 's' : ''}`;
+      } else {
+        toggleBtn.style.display = 'none';
+      }
+    }
+
+    function recordVoice(inputId, myLangId, targetLangId, previewId, speakerName) {
+      unlockAudio();
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) { alert("Speech Recognition not supported in this browser. Please type in the box."); return; }
+      const chosenLang = document.getElementById(myLangId).value;
+      const localeMap = { en: 'en-IN', bn: 'bn-IN', hi: 'hi-IN', mr: 'mr-IN', kn: 'kn-IN' };
+      const rec = new SR();
+      rec.lang = localeMap[chosenLang] || 'en-IN';
+      rec.start();
+      rec.onresult = (e) => {
+        document.getElementById(inputId).value = e.results[0][0].transcript;
+        sendTurn(speakerName, inputId, targetLangId, previewId, false);
+      };
+    }
+
+    function playNeuralVoice(text, langCode) {
+      const player = document.getElementById('voicePlayer');
+      const badge = document.getElementById('voiceIndicator');
+      player.pause();
+      const url = `/api/tts?lang=${encodeURIComponent(langCode)}&text=${encodeURIComponent(text)}&t=${Date.now()}`;
+      badge.innerText = "🔊 Speaking Translated Voice...";
+      player.src = url;
+      player.onended = () => { badge.innerText = "🔊 Auto-Voice: ON"; };
+      player.onerror = () => { badge.innerText = "🔊 Auto-Voice: ON"; };
+      player.play().catch(() => { badge.innerText = "🔊 Auto-Voice: ON"; });
+    }
+
+    async function sendTurn(speakerName, inputId, targetLangSelectId, previewId, useCloudAi) {
+      unlockAudio();
+      const spoken_text = document.getElementById(inputId).value.trim();
+      const target_lang = document.getElementById(targetLangSelectId).value;
+      const context = document.getElementById('contextSelect').value;
+      if (!spoken_text) return;
+
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ speaker_name: speakerName, spoken_text, target_lang, context, use_cloud_ai: useCloudAi })
+      });
+      const data = await res.json();
+
+      document.getElementById('keyBanner').innerHTML = data.key_notice ? `<div class="warn-box">⚠️ ${data.key_notice}</div>` : "";
+
+      const previewBox = document.getElementById(previewId);
+      previewBox.style.display = "block";
+      previewBox.innerHTML = "";
+      const strongEl = document.createElement('strong');
+      strongEl.textContent = `→ ${data.target_language_name}: `;
+      previewBox.appendChild(strongEl);
+      previewBox.appendChild(document.createTextNode(data.translated_text));
+
+      messagesList.unshift({
+        speakerName,
+        spoken_text,
+        target_lang,
+        detected_language: data.detected_language,
+        target_language_name: data.target_language_name,
+        translated_text: data.translated_text,
+        context: data.context,
+        timestamp: data.timestamp
+      });
+
+      renderMessages();
+      playNeuralVoice(data.translated_text, target_lang);
+    }
+  </script>
+</body>
+</html>
